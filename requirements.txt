@@ -1,4 +1,5 @@
 streamlit
-gTTS
 pandas
+numpy
+scikit-learn
 matplotlib
