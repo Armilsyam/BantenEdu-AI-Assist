@@ -110,14 +110,15 @@ elif menu == "📊 Dasbor Data Pilah GESI":
     st.header("📊 Analitik Data Pilah GESI (Dampak Inovasi)")
     st.write("Fitur pelacakan performa ini menjawab kebutuhan indikator GESI pada penilaian juri dengan menampilkan visualisasi data keterlibatan siswa berdasarkan gender dan disabilitas.")
     
-    # Membuat Data Simulasi Valid untuk Evaluasi 6 Bulan Terakhir
+        # Membuat Data Simulasi Valid untuk Evaluasi 6 Bulan Terakhir
     data_evaluasi = {
         'Bulan': ['Nov 25', 'Des 25', 'Jan 26', 'Feb 26', 'Mar 26', 'Apr 26'],
         'Siswa Laki-laki (%)':,
         'Siswa Perempuan (%)':,
-        'Siswa Disabilitas/SKh (%)': [40, 48, 55, 68, 82, 90]
+        'Siswa Disabilitas/SKh (%)': [40, 48, 55, 62, 70, 78]
     }
     df = pd.DataFrame(data_evaluasi)
+
     
     # Menampilkan KPI Grid
     col1, col2, col3 = st.columns(3)
