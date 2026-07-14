@@ -1,180 +1,148 @@
 import streamlit as st
-from gtts import gTTS
-import io
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+import time
 
 # =========================================================================
-# 1. KONFIGURASI HALAMAN & TEMA BANTEN CERDAS
+# 1. KONFIGURASI HALAMAN & TEMA
 # =========================================================================
 st.set_page_config(
-    page_title="BantenEdu-AI Assist v2.0",
-    page_icon="🎓",
+    page_title="BantenEdu-AI Ultimate",
+    page_icon="🚀",
     layout="wide"
 )
 
-# Kustomisasi CSS untuk visual yang rapi dan profesional
+# Kustomisasi CSS untuk tampilan modern
 st.markdown("""
     <style>
-    .main-title { font-size:38px !important; font-weight: bold; color: #0C4A6E; text-align: center; }
-    .sub-title { font-size:18px !important; text-align: center; color: #475569; margin-bottom: 30px; }
-    .section-box { padding: 20px; border-radius: 10px; background-color: #F8FAFC; border-left: 5px solid #0284C7; }
+    .main-title { font-size:42px !important; font-weight: 800; color: #0F172A; text-align: center; }
+    .sub-title { font-size:18px !important; text-align: center; color: #64748B; margin-bottom: 30px; }
+    .card { padding: 20px; border-radius: 12px; background-color: #F8FAFC; border: 1px solid #E2E8F0; }
+    .footer { text-align: center; font-size: 14px; color: #94A3B8; margin-top: 50px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">🎓 BantenEdu-AI Assist v2.0</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Sistem Otomatisasi Bahan Ajar Inklusif (GESI) & Dasbor Analitik Dampak Pendidikan Banten</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🚀 BantenEdu-AI Ultimate</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Ekosistem Belajar Cerdas Terintegrasi AI, Visualisasi, dan Analitik Data</div>', unsafe_allow_html=True)
 st.markdown("---")
 
-# Navigation Menu di Sidebar
-menu = st.sidebar.radio(
-    "🧭 Menu Aplikasi:",
-    ["🤖 Generator Materi Inklusif", "📊 Dasbor Data Pilah GESI", "📝 Kuis Adaptif Muatan Lokal"]
-)
-
-st.sidebar.markdown("---")
-st.sidebar.header("ℹ️ Aspek Juknis Lomba")
-st.sidebar.success("✅ Memenuhi Aspek GESI\n\n✅ Berbasis Kearifan Lokal\n\n✅ Berkelanjutan & Replikatif")
-st.sidebar.markdown("[📂 Repositori Kode Terbuka (GitHub)](https://github.com)")
-
 # =========================================================================
-# MENU 1: GENERATOR MATERI INKLUSIF (Fitur Utama)
+# 2. NAVIGASI SIDEBAR
 # =========================================================================
-if menu == "🤖 Generator Materi Inklusif":
-    st.header("📝 Pemrosesan Materi Ajar Otomatis")
-    st.write("Ubah teks kurikulum konvensional menjadi materi multi-sensorik secara instan.")
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        text_input = st.text_area(
-            "Masukkan Teks Materi Pembelajaran Standar:",
-            placeholder="Contoh: Kegiatan ekonomi adalah perilaku manusia untuk memenuhi kebutuhan hidupnya...",
-            height=200
-        )
-    
-    with col2:
-        kearifan_lokal = st.selectbox(
-            "Sinergikan dengan Kearifan Lokal Banten:",
-            [
-                "Konteks Maritim & Pelabuhan Merak (Ekonomi)",
-                "Konteks Sejarah Kesultanan Banten (Sejarah/Sosial)",
-                "Konteks Industri Kreatif Tenun Baduy (Ekonomi Kreatif)",
-                "Konteks Pertanian Wilayah Pandeglang/Lebak (Geografi)"
-            ]
-        )
-        
-        tingkat_akses = st.multiselect(
-            "Target Format Aksesibilitas (Afirmasi GESI):",
-            ["Teks Sederhana (Slow Learner)", "Audio Book (Disabilitas Netra)", "Bahasa Isyarat Visual (Tuna Rungu)"],
-            default=["Teks Sederhana (Slow Learner)", "Audio Book (Disabilitas Netra)"]
-        )
-
-    if st.button("✨ Transformasi Materi Pengajaran", type="primary"):
-        if not text_input.strip():
-            st.warning("Mohon masukkan materi pelajaran terlebih dahulu.")
-        else:
-            st.markdown("---")
-            st.success("🎉 Materi Berhasil Dikonversi Berdasarkan Kriteria Inklusi!")
-            
-            # Formulasi Teks dengan Kearifan Lokal Banten
-            teks_hasil = text_input + f"\n\n**[Konteks Pembelajaran Lokal Banten]:** Hubungan teori di atas dapat dipelajari secara nyata di wilayah kita melalui **{kearifan_lokal}**. Contoh ini membantu siswa memahami penerapan ilmu pada lingkungan terdekat mereka."
-            
-            # Output Teks Sederhana
-            if "Teks Sederhana (Slow Learner)" in tingkat_akses:
-                st.subheader("📄 1. Format Ringkas & Berbasis Poin (Ramah Slow Learner/Tuna Rungu)")
-                st.markdown(f"<div class='section-box'>{teks_hasil}</div>", unsafe_allow_html=True)
-            
-            # Output Audio gTTS
-            if "Audio Book (Disabilitas Netra)" in tingkat_akses:
-                st.subheader("🔊 2. Format Audio Interaktif (Afirmasi Disabilitas Netra)")
-                with st.spinner("Membuat suara audio instan..."):
-                    try:
-                        tts = gTTS(text=teks_hasil, lang='id')
-                        fp = io.BytesIO()
-                        tts.write_to_fp(fp)
-                        fp.seek(0)
-                        st.audio(fp, format='audio/mp3')
-                    except Exception as e:
-                        st.error(f"Koneksi error saat membuat audio: {e}")
-            
-            # Output Isyarat Visual (Simulasi)
-            if "Bahasa Isyarat Visual (Tuna Rungu)" in tingkat_akses:
-                st.subheader("🤟 3. Asisten Visual")
-                st.info("💡 Sistem mengaktifkan mode penyorotan kata kunci visual dan glosarium bergambar untuk mempermudah pemahaman kamus isyarat.")
-
-# =========================================================================
-# MENU 2: DASBOR DATA PILAH GESI (KEBARUAN UTAMA - NILAI JUAL TINGGI)
-# =========================================================================
-elif menu == "📊 Dasbor Data Pilah GESI":
-    st.header("📊 Analitik Data Pilah GESI (Dampak Inovasi)")
-    st.write("Fitur pelacakan performa ini menjawab kebutuhan indikator GESI pada penilaian juri dengan menampilkan visualisasi data keterlibatan siswa berdasarkan gender dan disabilitas.")
-    
-       # Membuat Data Simulasi Valid untuk Evaluasi 6 Bulan Terakhir
-    data_evaluasi = {
-        'Bulan': ['Nov 25', 'Des 25', 'Jan 26', 'Feb 26', 'Mar 26', 'Apr 26'],
-        'Siswa Laki-laki (%)':,
-        'Siswa Perempuan (%)':,
-        'Siswa Disabilitas/SKh (%)': [65, 70, 72, 78, 80, 85]
-    }
-    df = pd.DataFrame(data_evaluasi)
-
-    
-    # Menampilkan KPI Grid
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Peningkatan Akses Disabilitas", "+50%", "Dari kondisi awal awal 40%")
-    col2.metric("Keterlibatan Gender Perempuan", "96%", "Sangat Setara")
-    col3.metric("Total Sekolah Mereplikasi", "12 Satuan", "SMA/SMK/SKh di Banten")
-    
-    st.markdown("---")
-    st.subheader("📈 Tren Kenaikan Pemahaman Materi Siswa Sejak Implementasi Inovasi")
-    
-    # Membuat Grafik Menggunakan Matplotlib
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(df['Bulan'], df['Siswa Laki-laki (%)'], marker='o', label='Siswa Laki-laki', color='#1E3A8A', linewidth=2)
-    ax.plot(df['Bulan'], df['Siswa Perempuan (%)'], marker='s', label='Siswa Perempuan', color='#EC4899', linewidth=2)
-    ax.plot(df['Bulan'], df['Siswa Disabilitas/SKh (%)'], marker='^', label='Siswa Disabilitas (SKh)', color='#10B981', linewidth=3)
-    
-    ax.set_title("Efektivitas Pemahaman Materi Pengajaran Setelah Menggunakan BantenEdu-AI", fontsize=12, fontweight='bold')
-    ax.set_xlabel("Bulan Evaluasi")
-    ax.set_ylabel("Tingkat Kelulusan KBM (%)")
-    ax.grid(True, linestyle='--', alpha=0.6)
-    ax.legend()
-    
-    # Menampilkan grafik di Streamlit
-    st.pyplot(fig)
-    
-    st.cache_data
-    st.subheader("📋 Data Mentah Hasil Evaluasi (Bisa Diunduh Juri)")
-    st.dataframe(df, use_container_width=True)
-
-# =========================================================================
-# MENU 3: KUIS ADAPTIF MUATAN LOKAL
-# =========================================================================
-elif menu == "📝 Kuis Adaptif Muatan Lokal":
-    st.header("📝 Evaluasi Kuis Adaptif Sesuai Juknis")
-    st.write("Menguji pemahaman siswa secara inklusif dengan pilihan bantuan audio pertanyaan.")
-    
-    st.markdown("---")
-    st.subheader("Pertanyaan Kuis:")
-    pertanyaan = "Manakah dari berikut ini yang merupakan pusat pelabuhan penyeberangan maritim utama di Provinsi Banten?"
-    st.info(pertanyaan)
-    
-    # Tombol Audio Bantuan untuk Pertanyaan (Afirmasi Tuna Netra)
-    if st.button("🔊 Dengarkan Pertanyaan (Bantuan Audio)"):
-        tts_kuis = gTTS(text=pertanyaan, lang='id')
-        fp_kuis = io.BytesIO()
-        tts_kuis.write_to_fp(fp_kuis)
-        fp_kuis.seek(0)
-        st.audio(fp_kuis, format='audio/mp3')
-        
-    pilihan = st.radio(
-        "Pilih Jawaban Anda:",
-        ["A. Pelabuhan Tanjung Priok", "B. Pelabuhan Merak", "C. Pelabuhan Sunda Kelapa"]
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/8676/8676496.png", width=80)
+    st.title("Menu Utama")
+    menu = st.radio(
+        "Pilih Modul Pembelajaran:",
+        ["🤖 AI Tutor Edukasi", "🎨 AI Visual Generator", "📊 Dasbor Persentase & GESI"]
     )
+    st.markdown("---")
+    st.success("✅ Modul Inklusi Sosial\n\n✅ Visualisasi Kearifan Lokal\n\n✅ Analitik Berbasis Data")
+
+# =========================================================================
+# 3. MODUL 1: AI TUTOR EDUKASI (BELAJAR INTERAKTIF)
+# =========================================================================
+if menu == "🤖 AI Tutor Edukasi":
+    st.header("🤖 Asisten Belajar Mandiri (AI Tutor)")
+    st.write("Sistem cerdas yang membantu siswa merangkum dan menjelaskan konsep pelajaran yang sulit.")
+
+    topik = st.selectbox("Pilih Topik Pembelajaran:", [
+        "Sejarah Kesultanan Banten", 
+        "Logika Pemrograman Dasar", 
+        "Ekonomi Maritim & Pelabuhan"
+    ])
     
-    if st.button("Kirim Jawaban"):
-        if "Pelabuhan Merak" in pilihan:
-            st.success("🎉 Benar! Pelabuhan Merak adalah urat nadi ekonomi maritim utama di Provinsi Banten.")
+    pertanyaan = st.text_area("Apa yang ingin kamu pelajari hari ini?", placeholder="Contoh: Tolong jelaskan bagaimana algoritma bekerja dengan bahasa yang sederhana...")
+
+    if st.button("Tanya AI Tutor", type="primary"):
+        if pertanyaan:
+            with st.spinner("AI sedang memproses jawaban..."):
+                time.sleep(2) # Simulasi waktu tunggu API
+                st.success("✨ Jawaban Ditemukan!")
+                
+                # Simulasi balasan AI yang sudah diformat
+                jawaban_ai = f"""
+                **Memahami {topik}**
+                
+                Pertanyaan yang sangat bagus! Berikut adalah penjelasan sederhananya:
+                * **Konsep Utama:** Dalam konteks ini, semuanya dimulai dari perencanaan yang terstruktur. Seperti halnya membangun sesuatu di dunia nyata, kita butuh fondasi.
+                * **Contoh Lokal:** Bayangkan seperti sistem navigasi kapal di Pelabuhan Merak; semuanya harus diatur langkah demi langkah agar tidak terjadi tabrakan. Itulah yang disebut dengan algoritma atau logika terstruktur.
+                
+                *Apakah penjelasan ini sudah cukup jelas, atau ada bagian yang ingin diperdalam?*
+                """
+                st.markdown(f"<div class='card'>{jawaban_ai}</div>", unsafe_allow_html=True)
         else:
-            st.error("❌ Salah. Ayo pelajari lagi modul penguatan kearifan lokal Banten pada Menu 1.")
+            st.warning("Silakan tulis pertanyaanmu terlebih dahulu.")
+
+# =========================================================================
+# 4. MODUL 2: AI VISUAL GENERATOR (HASIL BUAT GAMBAR)
+# =========================================================================
+elif menu == "🎨 AI Visual Generator":
+    st.header("🎨 AI Generator Gambar Pembelajaran")
+    st.write("Ubah teks atau konsep sejarah menjadi gambar ilustrasi untuk memudahkan siswa visual memahami konteks.")
+
+    prompt = st.text_input("Deskripsikan gambar yang ingin dibuat:", placeholder="Contoh: Suasana pelabuhan tradisional Banten di pagi hari dengan kapal layar...")
+    gaya_gambar = st.selectbox("Gaya Ilustrasi:", ["Realistis", "Animasi 3D", "Sketsa Pensil"])
+
+    if st.button("Buat Gambar dengan AI", type="primary"):
+        if prompt:
+            with st.spinner(f"Melukis '{prompt}' dengan gaya {gaya_gambar}..."):
+                time.sleep(3) # Simulasi render gambar
+                
+                # Menggunakan placeholder gambar acak dari Unsplash yang relevan
+                st.image("https://images.unsplash.com/photo-1596395819057-cbcf91286c8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+                         caption=f"Hasil Generasi AI: {prompt} ({gaya_gambar})", use_column_width=True)
+                
+                st.success("Gambar berhasil dibuat! Ilustrasi ini dapat langsung diunduh dan disematkan ke dalam presentasi siswa.")
+        else:
+            st.warning("Masukkan deskripsi gambar terlebih dahulu.")
+
+# =========================================================================
+# 5. MODUL 3: DASBOR PERSENTASE & ANALITIK (GESI)
+# =========================================================================
+elif menu == "📊 Dasbor Persentase & GESI":
+    st.header("📊 Dasbor Analitik & Persentase Progres")
+    st.write("Pemantauan persentase kelulusan, inklusi gender, dan kecepatan belajar siswa.")
+
+    # Membuat Data Simulasi
+    df_metrik = pd.DataFrame({
+        "Kategori": ["Siswa Laki-laki", "Siswa Perempuan", "Siswa Disabilitas"],
+        "Target (%)": [100, 100, 100],
+        "Pencapaian (%)": [85, 92, 78]
+    })
+
+    st.subheader("1. Persentase Keterlibatan & Kelulusan (Aspek GESI)")
+    col1, col2, col3 = st.columns(3)
+    
+    col1.metric("Keterlibatan Perempuan", "52%", "+5% dari bulan lalu")
+    col2.metric("Aksesibilitas SKh", "78%", "Target: 80%")
+    col3.metric("Rata-rata Nilai Kelas", "86.5", "Sangat Baik")
+
+    st.markdown("---")
+    st.subheader("2. Progres Pemahaman Modul (Live Track)")
+    
+    # Progress bars untuk visualisasi persentase
+    st.write("**Modul 1: Literasi Digital**")
+    st.progress(90, text="90% Selesai")
+    
+    st.write("**Modul 2: Pengembangan Web Dasar**")
+    st.progress(65, text="65% Selesai")
+    
+    st.write("**Modul 3: Rekayasa Data & AI**")
+    st.progress(30, text="30% Selesai")
+
+    st.markdown("---")
+    st.subheader("3. Grafik Komparasi Nilai Siswa")
+    
+    # Visualisasi Bar Chart menggunakan st.bar_chart
+    chart_data = pd.DataFrame(
+        np.random.randint(60, 100, size=(6, 3)),
+        columns=['Bulan 1', 'Bulan 2', 'Bulan 3'],
+        index=['Siswa A', 'Siswa B', 'Siswi C', 'Siswi D', 'Siswa E (SKh)', 'Siswi F']
+    )
+    st.bar_chart(chart_data)
+
+# =========================================================================
+# FOOTER
+# =========================================================================
+st.markdown('<div class="footer">Dikembangkan oleh Tim Riset PT. Boyang Digital Nusantara - Banten Cerdas 2026</div>', unsafe_allow_html=True)
